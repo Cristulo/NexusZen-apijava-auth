@@ -1,9 +1,9 @@
 package com.nexuszen.auth.models;
 
 import jakarta.persistence.*;
-import lombok.*;
-import java.util.UUID;
 import java.time.LocalDate;
+import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "personas")

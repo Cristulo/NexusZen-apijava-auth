@@ -1,9 +1,9 @@
 package com.nexuszen.auth.modules.users.dto;
 
-import lombok.Builder;
-import lombok.Data;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder

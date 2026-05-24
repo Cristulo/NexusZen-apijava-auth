@@ -30,61 +30,56 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
   private String frontendUrl;
 
   public OAuth2LoginSuccessHandler(
-    JwtService jwtService,
-    UsuarioRepository usuarioRepository,
-    RolRepository rolRepository) {
-  this.jwtService = jwtService;
-  this.usuarioRepository = usuarioRepository;
-  this.rolRepository = rolRepository;
+      JwtService jwtService, UsuarioRepository usuarioRepository, RolRepository rolRepository) {
+    this.jwtService = jwtService;
+    this.usuarioRepository = usuarioRepository;
+    this.rolRepository = rolRepository;
   }
 
   @Override
   public void onAuthenticationSuccess(
-    HttpServletRequest request,
-    HttpServletResponse response,
-    Authentication authentication)
-    throws IOException {
-  OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-  String email = oAuth2User.getAttribute("email");
+      HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws IOException {
+    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+    String email = oAuth2User.getAttribute("email");
 
-  // Cargar Roles desde la base de datos
-  Usuario usuario = usuarioRepository.findByEmail(email)
-    .orElseGet(() -> {
-      Usuario nuevo = Usuario.builder()
-        .email(email)
-        .isActive(true)
-        .build();
-      return usuarioRepository.save(nuevo);
-    });
+    // Cargar Roles desde la base de datos
+    Usuario usuario =
+        usuarioRepository
+            .findByEmail(email)
+            .orElseGet(
+                () -> {
+                  Usuario nuevo = Usuario.builder().email(email).isActive(true).build();
+                  return usuarioRepository.save(nuevo);
+                });
 
-  Set<Rol> roles = usuario.getRoles();
-  if (roles == null || roles.isEmpty()) {
-    Rol roleUser = rolRepository.findByName("ROLE_USER")
-      .orElseGet(() -> {
-      Rol nuevoRol = Rol.builder()
-        .name("ROLE_USER")
-        .description("Default user role")
-        .build();
-      return rolRepository.save(nuevoRol);
-      });
-    if (roles == null) {
-    roles = new HashSet<>();
+    Set<Rol> roles = usuario.getRoles();
+    if (roles == null || roles.isEmpty()) {
+      Rol roleUser =
+          rolRepository
+              .findByName("ROLE_USER")
+              .orElseGet(
+                  () -> {
+                    Rol nuevoRol =
+                        Rol.builder().name("ROLE_USER").description("Default user role").build();
+                    return rolRepository.save(nuevoRol);
+                  });
+      if (roles == null) {
+        roles = new HashSet<>();
+      }
+      roles.add(roleUser);
+      usuario.setRoles(roles);
+      usuarioRepository.save(usuario);
     }
-    roles.add(roleUser);
-    usuario.setRoles(roles);
-    usuarioRepository.save(usuario);
-  }
 
-  List<String> roleNames = roles.stream()
-    .map(Rol::getName)
-    .collect(Collectors.toList());
+    List<String> roleNames = roles.stream().map(Rol::getName).collect(Collectors.toList());
 
-  Map<String, Object> claims = new HashMap<>();
-  claims.put("roles", roleNames);
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("roles", roleNames);
 
-  String token = jwtService.generateToken(email, claims);
+    String token = jwtService.generateToken(email, claims);
 
-  // Redirigir al frontend con el token en la URL (Opcionalmente cookie HTTP-Only)
-  response.sendRedirect(frontendUrl + "/?token=" + token);
+    // Redirigir al frontend con el token en la URL (Opcionalmente cookie HTTP-Only)
+    response.sendRedirect(frontendUrl + "/?token=" + token);
   }
 }

@@ -1,7 +1,7 @@
 package com.nexuszen.auth.modules.users.controller;
 
-import com.nexuszen.auth.modules.users.services.UserService;
 import com.nexuszen.auth.modules.users.dto.UsuarioResponseDTO;
+import com.nexuszen.auth.modules.users.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +23,18 @@ public class AuthController {
     this.userService = userService;
   }
 
-  @Operation(summary = "Obtener Perfil", description = "Retorna el perfil del usuario autenticado, incluyendo roles y permisos.")
+  @Operation(
+      summary = "Obtener Perfil",
+      description = "Retorna el perfil del usuario autenticado, incluyendo roles y permisos.")
   @GetMapping("/me")
   public ResponseEntity<UsuarioResponseDTO> getMyProfile() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+    if (authentication == null
+        || !authentication.isAuthenticated()
+        || "anonymousUser".equals(authentication.getPrincipal())) {
       return ResponseEntity.status(401).build();
     }
-    
+
     String email;
     if (authentication.getPrincipal() instanceof OAuth2User) {
       email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");

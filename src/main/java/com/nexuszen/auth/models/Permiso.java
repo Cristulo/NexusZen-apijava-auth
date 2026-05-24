@@ -1,8 +1,8 @@
 package com.nexuszen.auth.models;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "permisos")
@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class Permiso {
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;

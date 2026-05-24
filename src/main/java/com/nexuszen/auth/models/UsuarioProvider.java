@@ -1,13 +1,13 @@
 package com.nexuszen.auth.models;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.util.UUID;
+import lombok.*;
 
 @Entity
-@Table(name = "usuario_providers", uniqueConstraints = {
-  @UniqueConstraint(columnNames = {"provider_name", "provider_id"})
-})
+@Table(
+    name = "usuario_providers",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"provider_name", "provider_id"})})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

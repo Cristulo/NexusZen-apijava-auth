@@ -1,8 +1,8 @@
 package com.nexuszen.auth.modules.roles.dto;
 
-import lombok.Data;
-import java.util.UUID;
 import java.util.Set;
+import java.util.UUID;
+import lombok.Data;
 
 @Data
 public class AssignRoleRequestDTO {

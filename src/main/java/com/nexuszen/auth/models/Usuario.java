@@ -1,10 +1,10 @@
 package com.nexuszen.auth.models;
 
 import jakarta.persistence.*;
-import lombok.*;
-import java.util.UUID;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "usuarios")
@@ -33,10 +33,9 @@ public class Usuario {
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
-    name = "usuario_roles",
-    joinColumns = @JoinColumn(name = "usuario_id"),
-    inverseJoinColumns = @JoinColumn(name = "rol_id")
-  )
+      name = "usuario_roles",
+      joinColumns = @JoinColumn(name = "usuario_id"),
+      inverseJoinColumns = @JoinColumn(name = "rol_id"))
   @Builder.Default
   private Set<Rol> roles = new HashSet<>();
 

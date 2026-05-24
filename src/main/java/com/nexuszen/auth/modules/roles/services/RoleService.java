@@ -3,12 +3,11 @@ package com.nexuszen.auth.modules.roles.services;
 import com.nexuszen.auth.models.Rol;
 import com.nexuszen.auth.models.Usuario;
 import com.nexuszen.auth.models.repositories.RolRepository;
-import com.nexuszen.auth.repositories.UsuarioRepository;
 import com.nexuszen.auth.modules.roles.dto.AssignRoleRequestDTO;
-import org.springframework.stereotype.Service;
-
+import com.nexuszen.auth.repositories.UsuarioRepository;
 import java.util.HashSet;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class RoleService {
@@ -25,12 +24,14 @@ public class RoleService {
   }
 
   public void assignRolesToUser(AssignRoleRequestDTO dto) {
-    Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
+    Usuario usuario =
+        usuarioRepository
+            .findById(dto.getUsuarioId())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
     List<Rol> rolesAsignar = rolRepository.findAllById(dto.getRolIds());
     usuario.setRoles(new HashSet<>(rolesAsignar));
-    
+
     usuarioRepository.save(usuario);
   }
 }

@@ -1,10 +1,10 @@
 package com.nexuszen.auth.models;
 
 import jakarta.persistence.*;
-import lombok.*;
-import java.util.UUID;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "roles")
@@ -14,7 +14,7 @@ import java.util.HashSet;
 @Builder
 @EqualsAndHashCode(exclude = "permisos")
 public class Rol {
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
@@ -27,10 +27,9 @@ public class Rol {
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
-    name = "rol_permisos",
-    joinColumns = @JoinColumn(name = "rol_id"),
-    inverseJoinColumns = @JoinColumn(name = "permiso_id")
-  )
+      name = "rol_permisos",
+      joinColumns = @JoinColumn(name = "rol_id"),
+      inverseJoinColumns = @JoinColumn(name = "permiso_id"))
   @Builder.Default
   private Set<Permiso> permisos = new HashSet<>();
 }
