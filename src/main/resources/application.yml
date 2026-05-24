@@ -1,0 +1,41 @@
+server:
+  port: 5052
+  forward-headers-strategy: framework
+
+frontend:
+  url: http://localhost:3030
+
+spring:
+  application:
+    name: apijava-auth
+  datasource:
+    url: jdbc:h2:file:/usr/app/data/auth_db
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        "[format_sql]": true
+
+  # OAuth2 Stubs (These must be overridden by environment variables in production)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID:tu-client-id-google}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET:tu-client-secret-google}
+            scope: profile, email
+#          microsoft:
+#            client-id: dummy-ms-client-id
+#            client-secret: dummy-ms-client-secret
+#            scope: openid, profile, email
+
+jwt:
+  secret: super-secret-key-for-nexuszen-auth-that-must-be-long-enough-for-hs256-signature-12345
+  expiration: 86400000
