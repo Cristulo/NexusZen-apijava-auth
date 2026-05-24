@@ -30,7 +30,7 @@ WORKDIR /usr/app
 COPY --from=build /usr/src/app/target/*.jar app.jar
 
 # Exponer el puerto estandarizado de Auth
-EXPOSE 5052
+EXPOSE 5050
 
 # Regla de Seguridad DevOps: Crear un grupo y usuario del sistema sin privilegios
 RUN addgroup -S spring && adduser -S spring -G spring

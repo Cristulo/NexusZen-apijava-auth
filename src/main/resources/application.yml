@@ -1,5 +1,5 @@
 server:
-  port: 5052
+  port: 5050
   forward-headers-strategy: framework
 
 frontend:
