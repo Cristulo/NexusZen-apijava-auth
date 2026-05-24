@@ -6,6 +6,6 @@ import java.util.Set;
 
 @Data
 public class AssignRoleRequestDTO {
-    private UUID usuarioId;
-    private Set<UUID> rolIds;
+  private UUID usuarioId;
+  private Set<UUID> rolIds;
 }

@@ -17,27 +17,27 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Autenticación", description = "Endpoints de identidad y perfil de usuario")
 public class AuthController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
+  public AuthController(UserService userService) {
+    this.userService = userService;
+  }
+
+  @Operation(summary = "Obtener Perfil", description = "Retorna el perfil del usuario autenticado, incluyendo roles y permisos.")
+  @GetMapping("/me")
+  public ResponseEntity<UsuarioResponseDTO> getMyProfile() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+      return ResponseEntity.status(401).build();
+    }
+    
+    String email;
+    if (authentication.getPrincipal() instanceof OAuth2User) {
+      email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
+    } else {
+      email = authentication.getName(); // JWT sub fallback
     }
 
-    @Operation(summary = "Obtener Perfil", description = "Retorna el perfil del usuario autenticado, incluyendo roles y permisos.")
-    @GetMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> getMyProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            return ResponseEntity.status(401).build();
-        }
-        
-        String email;
-        if (authentication.getPrincipal() instanceof OAuth2User) {
-            email = ((OAuth2User) authentication.getPrincipal()).getAttribute("email");
-        } else {
-            email = authentication.getName(); // JWT sub fallback
-        }
-
-        return ResponseEntity.ok(userService.getProfileByEmail(email));
-    }
+    return ResponseEntity.ok(userService.getProfileByEmail(email));
+  }
 }

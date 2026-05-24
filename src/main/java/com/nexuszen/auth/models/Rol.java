@@ -14,23 +14,23 @@ import java.util.HashSet;
 @Builder
 @EqualsAndHashCode(exclude = "permisos")
 public class Rol {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String name; // Ej: "ROLE_ADMIN"
+  @Column(nullable = false, unique = true, length = 50)
+  private String name; // Ej: "ROLE_ADMIN"
 
-    @Column(length = 255)
-    private String description;
+  @Column(length = 255)
+  private String description;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "rol_permisos",
-        joinColumns = @JoinColumn(name = "rol_id"),
-        inverseJoinColumns = @JoinColumn(name = "permiso_id")
-    )
-    @Builder.Default
-    private Set<Permiso> permisos = new HashSet<>();
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+    name = "rol_permisos",
+    joinColumns = @JoinColumn(name = "rol_id"),
+    inverseJoinColumns = @JoinColumn(name = "permiso_id")
+  )
+  @Builder.Default
+  private Set<Permiso> permisos = new HashSet<>();
 }

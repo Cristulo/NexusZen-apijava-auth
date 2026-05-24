@@ -8,9 +8,9 @@ import java.util.UUID;
 @Data
 @Builder
 public class UsuarioResponseDTO {
-    private UUID id;
-    private String email;
-    private Boolean isActive;
-    private Set<String> roles;
-    private Set<String> permisos;
+  private UUID id;
+  private String email;
+  private Boolean isActive;
+  private Set<String> roles;
+  private Set<String> permisos;
 }

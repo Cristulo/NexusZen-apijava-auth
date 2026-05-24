@@ -12,25 +12,25 @@ import java.util.List;
 
 @Service
 public class RoleService {
-    private final RolRepository rolRepository;
-    private final UsuarioRepository usuarioRepository;
+  private final RolRepository rolRepository;
+  private final UsuarioRepository usuarioRepository;
 
-    public RoleService(RolRepository rolRepository, UsuarioRepository usuarioRepository) {
-        this.rolRepository = rolRepository;
-        this.usuarioRepository = usuarioRepository;
-    }
+  public RoleService(RolRepository rolRepository, UsuarioRepository usuarioRepository) {
+    this.rolRepository = rolRepository;
+    this.usuarioRepository = usuarioRepository;
+  }
 
-    public List<Rol> getAllRoles() {
-        return rolRepository.findAll();
-    }
+  public List<Rol> getAllRoles() {
+    return rolRepository.findAll();
+  }
 
-    public void assignRolesToUser(AssignRoleRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-                
-        List<Rol> rolesAsignar = rolRepository.findAllById(dto.getRolIds());
-        usuario.setRoles(new HashSet<>(rolesAsignar));
+  public void assignRolesToUser(AssignRoleRequestDTO dto) {
+    Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
-        usuarioRepository.save(usuario);
-    }
+    List<Rol> rolesAsignar = rolRepository.findAllById(dto.getRolIds());
+    usuario.setRoles(new HashSet<>(rolesAsignar));
+    
+    usuarioRepository.save(usuario);
+  }
 }

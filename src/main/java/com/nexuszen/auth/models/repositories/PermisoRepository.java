@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface PermisoRepository extends JpaRepository<Permiso, UUID> {
-    Optional<Permiso> findByName(String name);
+  Optional<Permiso> findByName(String name);
 }
