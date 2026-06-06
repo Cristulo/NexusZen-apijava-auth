@@ -12,6 +12,9 @@ RUN apk add --no-cache maven
 COPY pom.xml .
 RUN mvn dependency:go-offline -B || true
 
+# Copiar el archivo de configuración de checkstyle
+COPY checkstyle.xml .
+
 # Copiar el código fuente
 COPY src ./src
 
