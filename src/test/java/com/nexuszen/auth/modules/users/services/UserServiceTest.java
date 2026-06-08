@@ -6,8 +6,12 @@ import static org.mockito.Mockito.*;
 import com.nexuszen.auth.models.Permiso;
 import com.nexuszen.auth.models.Rol;
 import com.nexuszen.auth.models.Usuario;
-import com.nexuszen.auth.modules.users.dto.UsuarioResponseDTO;
-import com.nexuszen.auth.repositories.UsuarioRepository;
+import com.nexuszen.auth.models.enums.EmailType;
+import com.nexuszen.auth.models.enums.EmailCategory;
+import com.nexuszen.auth.models.enums.EstadoUsuario;
+import com.nexuszen.auth.models.UsuarioEmail;
+import com.nexuszen.auth.models.repositories.UsuarioEmailRepository;
+import com.nexuszen.auth.models.repositories.UsuarioRepository;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -17,11 +21,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
+  @Mock private UsuarioEmailRepository usuarioEmailRepository;
   @Mock private UsuarioRepository usuarioRepository;
+  @Mock private PasswordEncoder passwordEncoder;
 
   @InjectMocks private UserService userService;
 
@@ -35,34 +42,46 @@ public class UserServiceTest {
     testUsuario =
         Usuario.builder()
             .id(UUID.randomUUID())
-            .email("test@nexuszen.com")
-            .isActive(true)
+            .usuario("testuser")
+            .username("Test User")
+            .estado(EstadoUsuario.ACTIVO)
             .roles(Set.of(rol))
             .build();
+            
+    UsuarioEmail testEmail = UsuarioEmail.builder()
+        .id(UUID.randomUUID())
+        .email("test@nexuszen.com")
+        .tipo(EmailType.PRIMARY)
+        .categoria(EmailCategory.PERSONAL)
+        .verified(true)
+        .usuario(testUsuario)
+        .build();
+        
+    testUsuario.setEmails(Set.of(testEmail));
   }
 
   @Test
-  void getProfileByEmail_Success() {
-    when(usuarioRepository.findByEmail("test@nexuszen.com")).thenReturn(Optional.of(testUsuario));
+  void getByEmail_Success() {
+    UsuarioEmail mockEmail = testUsuario.getEmails().iterator().next();
+    when(usuarioEmailRepository.findByEmail("test@nexuszen.com")).thenReturn(Optional.of(mockEmail));
 
-    UsuarioResponseDTO response = userService.getProfileByEmail("test@nexuszen.com");
+    Usuario response = userService.getByEmail("test@nexuszen.com");
 
     assertNotNull(response);
-    assertEquals("test@nexuszen.com", response.getEmail());
-    assertTrue(response.getRoles().contains("ADMIN"));
-    assertTrue(response.getPermisos().contains("READ"));
+    assertTrue(response.getEmails().stream().anyMatch(e -> e.getEmail().equals("test@nexuszen.com")));
+    assertTrue(response.getRoles().stream().anyMatch(r -> r.getName().equals("ADMIN")));
 
-    verify(usuarioRepository, times(1)).findByEmail("test@nexuszen.com");
+    verify(usuarioEmailRepository, times(1)).findByEmail("test@nexuszen.com");
   }
 
   @Test
-  void getProfileByEmail_NotFound() {
-    when(usuarioRepository.findByEmail("notfound@nexuszen.com")).thenReturn(Optional.empty());
+  void getByEmail_NotFound() {
+    when(usuarioEmailRepository.findByEmail("notfound@nexuszen.com")).thenReturn(Optional.empty());
 
     assertThrows(
         RuntimeException.class,
         () -> {
-          userService.getProfileByEmail("notfound@nexuszen.com");
+          userService.getByEmail("notfound@nexuszen.com");
         });
   }
 }

@@ -14,6 +14,11 @@
       "name": "jwt.expiration",
       "type": "java.lang.Long",
       "description": "Tiempo de expiracion del token JWT en milisegundos."
+    },
+    {
+      "name": "app.storage.avatar-dir",
+      "type": "java.lang.String",
+      "description": "Directorio local de subida de imágenes de avatar."
     }
   ]
 }

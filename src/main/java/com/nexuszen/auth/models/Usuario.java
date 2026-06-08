@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import com.nexuszen.auth.models.enums.EstadoUsuario;
 import lombok.*;
 
 @Entity
@@ -18,15 +19,22 @@ public class Usuario {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @Column(nullable = false, unique = true)
-  private String email;
+  @Column(nullable = true, unique = true)
+  private String usuario; // Unique login, nullable because it might not be complete yet for OAuth
+
+  @Column(nullable = true)
+  private String username; // Display name
+
+  @Column(nullable = true)
+  private String profileImageUrl;
 
   @Column(nullable = true)
   private String passwordHash; // Opcional, ya que puede entrar solo con OAuth
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private Boolean isActive = true;
+  private EstadoUsuario estado = EstadoUsuario.ACTIVO;
 
   @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private Persona persona;
@@ -42,4 +50,16 @@ public class Usuario {
   @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private Set<UsuarioProvider> providers = new HashSet<>();
+
+  @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private Set<UsuarioEmail> emails = new HashSet<>();
+
+  @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private Set<UsuarioPreferencia> preferencias = new HashSet<>();
 }

@@ -4,10 +4,14 @@ server:
 
 logging:
   level:
-    org.springframework.security: DEBUG
+    "[org.springframework.security]": DEBUG
 
 frontend:
   url: ${FRONTEND_URL:http://localhost:3030}
+
+app:
+  storage:
+    avatar-dir: /usr/app/data/uploads
 
 spring:
   application:
@@ -36,10 +40,6 @@ spring:
             client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET:tu-client-secret-google}
             scope: profile, email
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-#          microsoft:
-#            client-id: dummy-ms-client-id
-#            client-secret: dummy-ms-client-secret
-#            scope: openid, profile, email
 
 jwt:
   secret: super-secret-key-for-nexuszen-auth-that-must-be-long-enough-for-hs256-signature-12345
