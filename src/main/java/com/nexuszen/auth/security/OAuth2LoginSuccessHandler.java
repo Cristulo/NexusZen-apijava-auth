@@ -2,8 +2,13 @@ package com.nexuszen.auth.security;
 
 import com.nexuszen.auth.models.Rol;
 import com.nexuszen.auth.models.Usuario;
+import com.nexuszen.auth.models.UsuarioEmail;
+import com.nexuszen.auth.models.enums.EmailCategory;
+import com.nexuszen.auth.models.enums.EmailType;
+import com.nexuszen.auth.models.enums.EstadoUsuario;
 import com.nexuszen.auth.models.repositories.RolRepository;
-import com.nexuszen.auth.repositories.UsuarioRepository;
+import com.nexuszen.auth.models.repositories.UsuarioEmailRepository;
+import com.nexuszen.auth.models.repositories.UsuarioRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,20 +24,25 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Component
+@Transactional
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final JwtService jwtService;
   private final UsuarioRepository usuarioRepository;
+  private final UsuarioEmailRepository usuarioEmailRepository;
   private final RolRepository rolRepository;
 
   @Value("${frontend.url:https://rank-bottle-front-electron.trycloudflare.com}")
   private String frontendUrl;
 
   public OAuth2LoginSuccessHandler(
-      JwtService jwtService, UsuarioRepository usuarioRepository, RolRepository rolRepository) {
+      JwtService jwtService, UsuarioRepository usuarioRepository, UsuarioEmailRepository usuarioEmailRepository, RolRepository rolRepository) {
     this.jwtService = jwtService;
     this.usuarioRepository = usuarioRepository;
+    this.usuarioEmailRepository = usuarioEmailRepository;
     this.rolRepository = rolRepository;
   }
 
@@ -44,14 +54,32 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     String email = oAuth2User.getAttribute("email");
 
     // Cargar Roles desde la base de datos
-    Usuario usuario =
-        usuarioRepository
-            .findByEmail(email)
-            .orElseGet(
-                () -> {
-                  Usuario nuevo = Usuario.builder().email(email).isActive(true).build();
-                  return usuarioRepository.save(nuevo);
-                });
+    Usuario usuario = usuarioEmailRepository.findByEmail(email)
+        .map(UsuarioEmail::getUsuario)
+        .orElseGet(() -> {
+            String displayName = oAuth2User.getAttribute("name");
+            String profileImageUrl = oAuth2User.getAttribute("picture");
+            
+            Usuario nuevoUsuario = Usuario.builder()
+                .usuario(null)
+                .username(displayName)
+                .profileImageUrl(profileImageUrl)
+                .estado(EstadoUsuario.ACTIVO)
+                .build();
+                
+            nuevoUsuario = usuarioRepository.save(nuevoUsuario);
+
+            UsuarioEmail nuevoEmail = UsuarioEmail.builder()
+                .usuario(nuevoUsuario)
+                .email(email)
+                .tipo(EmailType.PRIMARY)
+                .categoria(EmailCategory.PERSONAL)
+                .verified(true)
+                .build();
+                
+            usuarioEmailRepository.save(nuevoEmail);
+            return nuevoUsuario;
+        });
 
     Set<Rol> roles = usuario.getRoles();
     if (roles == null || roles.isEmpty()) {
@@ -79,7 +107,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     String token = jwtService.generateToken(email, claims);
 
-    // Redirigir al frontend con el token en la URL (Opcionalmente cookie HTTP-Only)
-    response.sendRedirect(frontendUrl + "/?token=" + token);
+    // Redirigir al frontend con el token en la URL
+    if (usuario.getUsuario() == null) {
+      // Falta completar el registro
+      response.sendRedirect(frontendUrl + "/completar-registro?token=" + token);
+    } else {
+      response.sendRedirect(frontendUrl + "/?token=" + token);
+    }
   }
 }

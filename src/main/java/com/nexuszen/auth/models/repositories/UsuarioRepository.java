@@ -1,4 +1,4 @@
-package com.nexuszen.auth.repositories;
+package com.nexuszen.auth.models.repositories;
 
 import com.nexuszen.auth.models.Usuario;
 import java.util.Optional;
@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
-  Optional<Usuario> findByEmail(String email);
+  Optional<Usuario> findByUsuario(String usuario);
+  boolean existsByUsuario(String usuario);
 }

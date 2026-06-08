@@ -11,6 +11,10 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -18,14 +22,17 @@ public class SecurityConfig {
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
   private final ClientRegistrationRepository clientRegistrationRepository;
+  private final BffAuthenticationFilter bffAuthenticationFilter;
 
   public SecurityConfig(
       CustomOAuth2UserService customOAuth2UserService,
       OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
-      ClientRegistrationRepository clientRegistrationRepository) {
+      ClientRegistrationRepository clientRegistrationRepository,
+      BffAuthenticationFilter bffAuthenticationFilter) {
     this.customOAuth2UserService = customOAuth2UserService;
     this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
     this.clientRegistrationRepository = clientRegistrationRepository;
+    this.bffAuthenticationFilter = bffAuthenticationFilter;
   }
 
   private OAuth2AuthorizationRequestResolver authorizationRequestResolver() {
@@ -38,6 +45,11 @@ public class SecurityConfig {
         customizer ->
             customizer.additionalParameters(params -> params.put("prompt", "select_account")));
     return resolver;
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
   @Bean
@@ -58,7 +70,8 @@ public class SecurityConfig {
                     .authorizationEndpoint(
                         authz -> authz.authorizationRequestResolver(authorizationRequestResolver()))
                     .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                    .successHandler(oAuth2LoginSuccessHandler));
+                    .successHandler(oAuth2LoginSuccessHandler))
+        .addFilterBefore(bffAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
