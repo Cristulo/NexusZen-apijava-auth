@@ -35,6 +35,7 @@ public class AuthController {
       Map<String, String> response = authDelegate.login(usuarioStr, passwordStr);
       return ResponseEntity.ok(response);
     } catch (Exception e) {
+      e.printStackTrace();
       return ResponseEntity.status(401).build();
     }
   }

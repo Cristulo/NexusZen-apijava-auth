@@ -26,9 +26,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         "[format_sql]": true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:import.sql
 
   # OAuth2 Stubs (These must be overridden by environment variables in production)
   security:

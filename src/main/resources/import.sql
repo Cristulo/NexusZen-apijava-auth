@@ -28,4 +28,21 @@ MERGE INTO parametros_preferencia (id, nombre, descripcion) KEY (id) VALUES
 ('10000000-0000-0000-0000-000000000001', 'tema_oscuro', 'Preferencia de tema oscuro para la interfaz (Booleano)'),
 ('10000000-0000-0000-0000-000000000002', 'notificaciones_email', 'Recibir notificaciones por correo electrónico (Booleano)'),
 ('10000000-0000-0000-0000-000000000003', 'idioma_preferido', 'Idioma preferido de la interfaz (Cadena)'),
-('10000000-0000-0000-0000-000000000004', 'acceso_directo', 'Acceso directo de navegación en la navbar (Cadena)');
+('10000000-0000-0000-0000-000000000004', 'acceso_directo', 'Acceso directo de navegación en la navbar (Cadena)'),
+('10000000-0000-0000-0000-000000000005', 'rol_activo', 'Rol activo del usuario en la plataforma (Cadena)');
+
+-- Crear usuario cristulo con todos los roles (Contraseña local: cristulo)
+MERGE INTO usuarios (id, usuario, username, password_hash, estado) KEY (id) VALUES
+('99999999-9999-9999-9999-999999999999', 'cristulo', 'Cristian', '$2a$10$vD2.h9S6P1D8h9u9sFq1.OGt57B4O9Gpeq76pQy4UoW8uWJmpxcKq', 'ACTIVO');
+
+-- Vincular todos los roles a cristulo
+MERGE INTO usuario_roles (usuario_id, rol_id) KEY (usuario_id, rol_id) VALUES
+('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111'),
+('99999999-9999-9999-9999-999999999999', '22222222-2222-2222-2222-222222222222'),
+('99999999-9999-9999-9999-999999999999', '33333333-3333-3333-3333-333333333333'),
+('99999999-9999-9999-9999-999999999999', '44444444-4444-4444-4444-444444444444'),
+('99999999-9999-9999-9999-999999999999', '55555555-5555-5555-5555-555555555555');
+
+-- Vincular email a cristulo
+MERGE INTO usuario_emails (id, usuario_id, email, tipo, categoria, verified) KEY (id) VALUES
+('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '99999999-9999-9999-9999-999999999999', 'cristulox@gmail.com', 'PRIMARY', 'PERSONAL', true);
