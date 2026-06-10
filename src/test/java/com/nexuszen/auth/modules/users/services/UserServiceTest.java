@@ -84,4 +84,27 @@ public class UserServiceTest {
           userService.getByEmail("notfound@nexuszen.com");
         });
   }
+
+  @Test
+  void getByEmail_Normalization_Success() {
+    UsuarioEmail mockEmail = testUsuario.getEmails().iterator().next();
+    when(usuarioEmailRepository.findByEmail("test@nexuszen.com")).thenReturn(Optional.of(mockEmail));
+
+    Usuario response = userService.getByEmail("  TEST@NexusZen.Com  ");
+
+    assertNotNull(response);
+    verify(usuarioEmailRepository, times(1)).findByEmail("test@nexuszen.com");
+  }
+
+  @Test
+  void getByUsuario_Normalization_Success() {
+    when(usuarioRepository.findByUsuario("testuser")).thenReturn(Optional.of(testUsuario));
+
+    Usuario response = userService.getByUsuario("  TESTUSER  ");
+
+    assertNotNull(response);
+    assertEquals("testuser", response.getUsuario());
+    verify(usuarioRepository, times(1)).findByUsuario("testuser");
+  }
 }
+

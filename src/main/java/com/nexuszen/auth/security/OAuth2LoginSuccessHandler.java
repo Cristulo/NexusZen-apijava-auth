@@ -9,6 +9,7 @@ import com.nexuszen.auth.models.enums.EstadoUsuario;
 import com.nexuszen.auth.models.repositories.RolRepository;
 import com.nexuszen.auth.models.repositories.UsuarioEmailRepository;
 import com.nexuszen.auth.models.repositories.UsuarioRepository;
+import com.nexuszen.auth.utils.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
       throws IOException {
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-    String email = oAuth2User.getAttribute("email");
+    String email = StringUtils.normalizeEmail(oAuth2User.getAttribute("email"));
 
     // Cargar Roles desde la base de datos
     Usuario usuario = usuarioEmailRepository.findByEmail(email)

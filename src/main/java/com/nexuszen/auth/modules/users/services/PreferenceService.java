@@ -3,6 +3,7 @@ package com.nexuszen.auth.modules.users.services;
 import com.nexuszen.auth.models.ParametroPreferencia;
 import com.nexuszen.auth.models.Usuario;
 import com.nexuszen.auth.models.UsuarioPreferencia;
+import com.nexuszen.auth.models.enums.CategoriaPreferencia;
 import com.nexuszen.auth.modules.users.dto.PreferenceUpdateDTO;
 import com.nexuszen.auth.models.repositories.ParametroPreferenciaRepository;
 import com.nexuszen.auth.models.repositories.UsuarioPreferenciaRepository;
@@ -32,6 +33,7 @@ public class PreferenceService {
             ParametroPreferencia nuevoParam = ParametroPreferencia.builder()
                 .nombre(dto.getParametro())
                 .descripcion("Parámetro autogenerado: " + dto.getParametro())
+                .categoria(CategoriaPreferencia.SISTEMA)
                 .build();
             return parametroPreferenciaRepository.save(nuevoParam);
         });

@@ -7,6 +7,7 @@ import com.nexuszen.auth.models.enums.EmailCategory;
 import com.nexuszen.auth.models.enums.EmailType;
 import com.nexuszen.auth.models.repositories.UsuarioEmailRepository;
 import com.nexuszen.auth.models.repositories.UsuarioRepository;
+import com.nexuszen.auth.utils.StringUtils;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +29,9 @@ public class UserService {
   }
 
   public Usuario getByEmail(String email) {
+    String normalizedEmail = StringUtils.normalizeEmail(email);
     return usuarioEmailRepository
-        .findByEmail(email)
+        .findByEmail(normalizedEmail)
         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
         .getUsuario();
   }
@@ -41,8 +43,9 @@ public class UserService {
   }
 
   public Usuario getByUsuario(String usuario) {
+    String normalizedUsuario = StringUtils.normalizeUsername(usuario);
     return usuarioRepository
-        .findByUsuario(usuario)
+        .findByUsuario(normalizedUsuario)
         .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + usuario));
   }
 
@@ -54,12 +57,13 @@ public class UserService {
     Usuario usuario = getByEmail(email);
 
     if (newUsuario != null && !newUsuario.isEmpty()) {
-      usuarioRepository.findByUsuario(newUsuario).ifPresent(existingUser -> {
+      String normalizedNewUsuario = StringUtils.normalizeUsername(newUsuario);
+      usuarioRepository.findByUsuario(normalizedNewUsuario).ifPresent(existingUser -> {
         if (!existingUser.getId().equals(usuario.getId())) {
           throw new RuntimeException("El @usuario ya está en uso");
         }
       });
-      usuario.setUsuario(newUsuario);
+      usuario.setUsuario(normalizedNewUsuario);
     }
 
     if (newUsername != null && !newUsername.isEmpty()) {
@@ -73,12 +77,13 @@ public class UserService {
     Usuario usuario = getByEmail(email);
 
     if (newUsuario != null && !newUsuario.isEmpty()) {
-      usuarioRepository.findByUsuario(newUsuario).ifPresent(existingUser -> {
+      String normalizedNewUsuario = StringUtils.normalizeUsername(newUsuario);
+      usuarioRepository.findByUsuario(normalizedNewUsuario).ifPresent(existingUser -> {
         if (!existingUser.getId().equals(usuario.getId())) {
           throw new RuntimeException("El @usuario ya está en uso");
         }
       });
-      usuario.setUsuario(newUsuario);
+      usuario.setUsuario(normalizedNewUsuario);
     }
 
     if (newUsername != null && !newUsername.isEmpty()) {
@@ -118,15 +123,18 @@ public class UserService {
   }
 
   public Usuario createUser(String usuarioName, String username, String email, String plainPassword) {
-    if (usuarioRepository.existsByUsuario(usuarioName)) {
+    String normalizedUsuarioName = StringUtils.normalizeUsername(usuarioName);
+    String normalizedEmail = StringUtils.normalizeEmail(email);
+
+    if (usuarioRepository.existsByUsuario(normalizedUsuarioName)) {
       throw new RuntimeException("El @usuario ya está en uso");
     }
-    if (usuarioEmailRepository.findByEmail(email).isPresent()) {
+    if (usuarioEmailRepository.findByEmail(normalizedEmail).isPresent()) {
       throw new RuntimeException("El email ya está en uso");
     }
 
     Usuario nuevoUsuario = Usuario.builder()
-        .usuario(usuarioName)
+        .usuario(normalizedUsuarioName)
         .username(username)
         .passwordHash(passwordEncoder.encode(plainPassword))
         .estado(EstadoUsuario.ACTIVO)
@@ -136,7 +144,7 @@ public class UserService {
 
     UsuarioEmail userEmail = UsuarioEmail.builder()
         .usuario(nuevoUsuario)
-        .email(email)
+        .email(normalizedEmail)
         .tipo(EmailType.PRIMARY)
         .categoria(EmailCategory.PERSONAL)
         .verified(true) // Assumed verified if created by admin
@@ -151,12 +159,13 @@ public class UserService {
     Usuario usuario = getById(id);
 
     if (newUsuario != null && !newUsuario.isEmpty()) {
-      usuarioRepository.findByUsuario(newUsuario).ifPresent(existingUser -> {
+      String normalizedNewUsuario = StringUtils.normalizeUsername(newUsuario);
+      usuarioRepository.findByUsuario(normalizedNewUsuario).ifPresent(existingUser -> {
         if (!existingUser.getId().equals(usuario.getId())) {
           throw new RuntimeException("El @usuario ya está en uso");
         }
       });
-      usuario.setUsuario(newUsuario);
+      usuario.setUsuario(normalizedNewUsuario);
     }
 
     if (newUsername != null && !newUsername.isEmpty()) {

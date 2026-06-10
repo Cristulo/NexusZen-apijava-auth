@@ -7,6 +7,7 @@ import com.nexuszen.auth.models.enums.EmailType;
 import com.nexuszen.auth.models.enums.EstadoUsuario;
 import com.nexuszen.auth.models.repositories.UsuarioEmailRepository;
 import com.nexuszen.auth.models.repositories.UsuarioRepository;
+import com.nexuszen.auth.utils.StringUtils;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +35,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
     OAuth2User oAuth2User = super.loadUser(userRequest);
 
-    String email = oAuth2User.getAttribute("email");
-    if (email == null) {
+    String rawEmail = oAuth2User.getAttribute("email");
+    if (rawEmail == null) {
       log.error("OAuth2 provider did not return an email address.");
       throw new OAuth2AuthenticationException("Email no provisto por el proveedor OAuth");
     }
 
+    String email = StringUtils.normalizeEmail(rawEmail);
     Optional<UsuarioEmail> emailOpt = usuarioEmailRepository.findByEmail(email);
 
     if (emailOpt.isEmpty()) {
