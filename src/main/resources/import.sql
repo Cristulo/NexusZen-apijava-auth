@@ -2,7 +2,8 @@
 MERGE INTO roles (id, name, description) KEY (id) VALUES 
 ('11111111-1111-1111-1111-111111111111', 'ROLE_USER', 'Usuario estándar de la plataforma'),
 ('22222222-2222-2222-2222-222222222222', 'ROLE_ADMIN', 'Administrador de sistema'),
-('33333333-3333-3333-3333-333333333333', 'ROLE_SUPERADMIN', 'Super Administrador global');
+('33333333-3333-3333-3333-333333333333', 'ROLE_SUPERADMIN', 'Super Administrador global'),
+('44444444-4444-4444-4444-444444444444', 'ROLE_ADMINISTRADOR_FACULTAD', 'Administrador de facultad');
 
 -- Permisos base para NexusZen (Idempotente)
 MERGE INTO permisos (id, name, description) KEY (id) VALUES 
@@ -31,11 +32,12 @@ MERGE INTO parametros_preferencia (id, nombre, descripcion, categoria) KEY (id) 
 MERGE INTO usuarios (id, usuario, username, password_hash, estado) KEY (id) VALUES
 ('99999999-9999-9999-9999-999999999999', 'cristulo', 'Cristian', '$2a$10$vD2.h9S6P1D8h9u9sFq1.OGt57B4O9Gpeq76pQy4UoW8uWJmpxcKq', 'ACTIVO');
 
--- Vincular roles autorizados a cristulo (USER, ADMIN, SUPERADMIN)
+-- Vincular roles autorizados a cristulo (USER, ADMIN, SUPERADMIN, ADMINISTRADOR_FACULTAD)
 MERGE INTO usuario_roles (usuario_id, rol_id) KEY (usuario_id, rol_id) VALUES
 ('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111'),
 ('99999999-9999-9999-9999-999999999999', '22222222-2222-2222-2222-222222222222'),
-('99999999-9999-9999-9999-999999999999', '33333333-3333-3333-3333-333333333333');
+('99999999-9999-9999-9999-999999999999', '33333333-3333-3333-3333-333333333333'),
+('99999999-9999-9999-9999-999999999999', '44444444-4444-4444-4444-444444444444');
 
 -- Vincular email a cristulo
 MERGE INTO usuario_emails (id, usuario_id, email, tipo, categoria, verified) KEY (id) VALUES
